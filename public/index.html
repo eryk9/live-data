@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport meta removed for fixed desktop layout -->
+    <title>Dating App - Incontri</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">💕 DatingApp</div>
+            <nav class="nav">
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#discover">Scopri</a></li>
+                    <li><a href="#matches">Match</a></li>
+                    <li><a href="#messages">Messaggi</a></li>
+                    <li><a href="#profile">Profilo</a></li>
+                    <li><a href="#" onclick="logout(); return false;" class="btn-logout">Logout</a></li>
+                </ul>
+            </nav>
+            <!-- menu-toggle removed for non-responsive fixed layout -->
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <!-- Hero Section -->
+        <section id="home" class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Trova l'Amore Online</h1>
+                    <p>Incontra persone interessanti e costruisci connessioni significative</p>
+                    <button class="btn btn-primary" onclick="scrollTo('#discover')">Inizia Ora</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Discover Section -->
+        <section id="discover" class="discover">
+            <div class="container">
+                <h2>Scopri Profili</h2>
+                
+                <div class="discover-content">
+                    <div class="profile-card">
+                        <div class="profile-image">
+                            <img src="https://via.placeholder.com/400x500?text=Sofia" alt="Sofia">
+                        </div>
+                        <div class="profile-info">
+                            <h3>Sofia, 26</h3>
+                            <p class="interests">🎨 Arte • 🎵 Musica • 🌍 Viaggi</p>
+                            <p class="bio">Amo scoprire nuovi posti e incontrare persone interessanti. Sempre pronta per un caffè!</p>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn btn-reject" onclick="rejectProfile()">❌</button>
+                            <button class="btn btn-like" onclick="likeProfile()">❤️</button>
+                        </div>
+                    </div>
+
+                    <div class="stats">
+                        <div class="stat-item">
+                            <h4>50</h4>
+                            <p>Nuovi Profili</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>12</h4>
+                            <p>Match Oggi</p>
+                        </div>
+                        <div class="stat-item">
+                            <h4>8</h4>
+                            <p>Messaggi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Matches Section -->
+        <section id="matches" class="matches">
+            <div class="container">
+                <h2>I Tuoi Match</h2>
+                <div class="matches-grid">
+                    <div class="match-card">
+                        <img src="https://via.placeholder.com/150?text=Elena" alt="Elena">
+                        <h4>Elena, 24</h4>
+                        <p class="match-meta">Matchata 2 giorni fa</p>
+                        <button class="btn btn-primary btn-small">Scrivi</button>
+                    </div>
+                    <div class="match-card">
+                        <img src="https://via.placeholder.com/150?text=Giulia" alt="Giulia">
+                        <h4>Giulia, 23</h4>
+                        <p class="match-meta">Matchata 5 giorni fa</p>
+                        <button class="btn btn-primary btn-small">Scrivi</button>
+                    </div>
+                    <div class="match-card">
+                        <img src="https://via.placeholder.com/150?text=Maria" alt="Maria">
+                        <h4>Maria, 27</h4>
+                        <p class="match-meta">Matchata 1 settimana fa</p>
+                        <button class="btn btn-primary btn-small">Scrivi</button>
+                    </div>
+                    <div class="match-card">
+                        <img src="https://via.placeholder.com/150?text=Laura" alt="Laura">
+                        <h4>Laura, 25</h4>
+                        <p class="match-meta">Matchata 3 giorni fa</p>
+                        <button class="btn btn-primary btn-small">Scrivi</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Section -->
+        <section id="messages" class="messages">
+            <div class="container">
+                <h2>Conversazioni</h2>
+                <div class="messages-layout">
+                    <aside class="messages-list">
+                        <div class="message-item active">
+                            <div class="message-avatar">E</div>
+                            <div class="message-preview">
+                                <h5>Elena</h5>
+                                <p>Ciao! Come stai?</p>
+                            </div>
+                            <span class="message-time">2m</span>
+                        </div>
+                        <div class="message-item">
+                            <div class="message-avatar">G</div>
+                            <div class="message-preview">
+                                <h5>Giulia</h5>
+                                <p>Mi piacerebbe conoscerti...</p>
+                            </div>
+                            <span class="message-time">1h</span>
+                        </div>
+                        <div class="message-item">
+                            <div class="message-avatar">M</div>
+                            <div class="message-preview">
+                                <h5>Maria</h5>
+                                <p>Che bello il tuo profilo!</p>
+                            </div>
+                            <span class="message-time">3h</span>
+                        </div>
+                    </aside>
+
+                    <div class="messages-chat">
+                        <div class="chat-header">
+                            <h3>Elena, 24</h3>
+                            <p>Online</p>
+                        </div>
+                        <div class="chat-messages">
+                            <div class="message-row received">
+                                <div class="message">Ciao! Come stai?</div>
+                            </div>
+                            <div class="message-row sent">
+                                <div class="message">Ciao Elena! Tutto bene, grazie!</div>
+                            </div>
+                            <div class="message-row received">
+                                <div class="message">Che bello il tuo profilo 😊</div>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" placeholder="Scrivi un messaggio...">
+                            <button class="btn btn-primary">Invia</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile" class="profile">
+            <div class="container">
+                <h2>Il Mio Profilo</h2>
+                <div class="profile-form">
+                    <div class="profile-header">
+                        <div class="profile-avatar-large">
+                            <img src="https://via.placeholder.com/200?text=Tu" alt="Il tuo profilo">
+                        </div>
+                        <div class="profile-basic">
+                            <h3>Marco, 28</h3>
+                            <p>Milano, Italia</p>
+                            <button class="btn btn-secondary">Cambia Foto</button>
+                        </div>
+                    </div>
+
+                    <form>
+                        <div class="form-group">
+                            <label>Nome</label>
+                            <input type="text" value="Marco" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Età</label>
+                                <input type="number" value="28" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Città</label>
+                                <input type="text" value="Milano" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Bio</label>
+                            <textarea rows="4" placeholder="Descrivi te stesso...">Sviluppatore appassionato, amante della tecnologia e dei viaggi. Cerco conversazioni interessanti!</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Interessi</label>
+                            <div class="interests-grid">
+                                <label class="interest-tag">
+                                    <input type="checkbox" checked>
+                                    <span>💻 Tecnologia</span>
+                                </label>
+                                <label class="interest-tag">
+                                    <input type="checkbox">
+                                    <span>🎵 Musica</span>
+                                </label>
+                                <label class="interest-tag">
+                                    <input type="checkbox" checked>
+                                    <span>🌍 Viaggi</span>
+                                </label>
+                                <label class="interest-tag">
+                                    <input type="checkbox">
+                                    <span>🎬 Film</span>
+                                </label>
+                                <label class="interest-tag">
+                                    <input type="checkbox">
+                                    <span>⚽ Sport</span>
+                                </label>
+                                <label class="interest-tag">
+                                    <input type="checkbox" checked>
+                                    <span>🍽️ Cibo</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Salva Profilo</button>
+                            <button type="button" class="btn btn-secondary">Annulla</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 DatingApp. Tutti i diritti riservati.</p>
+            <ul>
+                <li><a href="#">Privacy</a></li>
+                <li><a href="#">Termini</a></li>
+                <li><a href="#">Contatti</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -11,3 +11,33 @@ To run this application:
 ```
 npm start
 ```
+
+## API Endpoints
+
+| Metodo | Url | Descrizione |
+|--------|-----|------------|
+| GET | `/` | Status dell'app |
+| GET | `/status` | Check DB + Redis |
+| GET | `/users` | Lista utenti (cached) |
+
+## Struttura del Progetto
+
+```
+.
+├── index.js            - Entry point dell'app
+├── db.js               - Pool di connessione PostgreSQL
+├── cache.js            - Client Redis
+├── schema.sql          - Schema database
+├── package.json        - Dipendenze
+└── .env.example        - Template variabili
+```
+
+## Database Schema
+
+Tabelle principali:
+- **users** - Profili utenti
+- **profiles** - Dettagli profilo (genere, interessi)
+- **matches** - Matching tra utenti
+- **messages** - Messaggistica tra matched
+
+Vedi `schema.sql` per i dettagli completi.

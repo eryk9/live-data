@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport meta removed for fixed desktop layout -->
+    <title>Login - Dating App</title>
+    <link rel="stylesheet" href="auth-style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>💕 DatingApp</h1>
+                <p>Torna al tuo account</p>
+            </div>
+
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required placeholder="tua@email.com">
+                    <span class="error" id="emailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" required placeholder="••••••••">
+                        <button type="button" class="toggle-password" onclick="togglePassword()">👁️</button>
+                    </div>
+                    <span class="error" id="passwordError"></span>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember">
+                        <input type="checkbox" name="remember">
+                        <span>Ricordami</span>
+                    </label>
+                    <a href="forgot-password.html" class="forgot-link">Password dimenticata?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Accedi</button>
+                <span class="error" id="loginError"></span>
+            </form>
+
+            <div class="auth-footer">
+                <p>Non hai un account? <a href="signup.html" class="auth-link">Registrati</a></p>
+            </div>
+        </div>
+
+        <div class="auth-image">
+            <div class="gradient-bg"></div>
+            <h2>Trova l'amore oggi</h2>
+            <p>Milioni di persone ti stanno aspettando 💫</p>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

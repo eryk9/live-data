@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <!-- viewport meta removed for fixed desktop layout -->
+    <title>Registrazione - Dating App</title>
+    <link rel="stylesheet" href="auth-style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>💕 DatingApp</h1>
+                <p>Crea il tuo account</p>
+            </div>
+
+            <form id="signupForm" class="auth-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Nome</label>
+                        <input type="text" id="name" name="name" required placeholder="Marco">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Età</label>
+                        <input type="number" id="age" name="age" min="18" max="120" required placeholder="25">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" name="email" required placeholder="tua@email.com">
+                    <span class="error" id="signupEmailError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <div class="password-input">
+                        <input type="password" id="signupPassword" name="password" required placeholder="Min 8 caratteri">
+                        <button type="button" class="toggle-password" onclick="toggleSignupPassword()">👁️</button>
+                    </div>
+                    <small>Min 8 caratteri, 1 maiuscola, 1 numero</small>
+                    <span class="error" id="signupPasswordError"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Conferma Password</label>
+                    <div class="password-input">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="••••••••">
+                        <button type="button" class="toggle-password" onclick="toggleConfirmPassword()">👁️</button>
+                    </div>
+                    <span class="error" id="confirmPasswordError"></span>
+                </div>
+
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" name="terms" required>
+                        <span>Accetto i <a href="#">Termini e Condizioni</a> e l'<a href="#">Informativa Privacy</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">Crea Account</button>
+                <span class="error" id="signupError"></span>
+            </form>
+
+            <div class="auth-footer">
+                <p>Hai già un account? <a href="login.html" class="auth-link">Accedi</a></p>
+            </div>
+        </div>
+
+        <div class="auth-image">
+            <div class="gradient-bg"></div>
+            <h2>Unisciti a milioni</h2>
+            <p>Inizia il tuo viaggio verso l'amore 💘</p>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>
