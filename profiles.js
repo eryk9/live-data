@@ -1,55 +1,87 @@
 const pool = require('./db');
+const logger = require('./logger');
 
-// Recupera il profilo dell'utente autenticato
+// Recupera il profilo dell'utente autenticato (optimized con JOIN)
 async function getMyProfile(req, res) {
   const userId = req.user?.id;
   if (!userId) return res.status(401).json({ message: 'Utente non autenticato' });
 
   try {
-    const userRes = await pool.query(
-      'SELECT id, name, age, bio, photo_url, email FROM users WHERE id = $1',
+    // JOIN una sola query invece di N+1
+    const result = await pool.query(
+      `SELECT 
+        u.id, u.name, u.age, u.bio, u.photo_url, u.email,
+        p.gender, p.interests, p.looking_for
+       FROM users u
+       LEFT JOIN profiles p ON u.id = p.user_id
+       WHERE u.id = $1`,
       [userId]
     );
 
-    const profileRes = await pool.query(
-      'SELECT gender, interests, looking_for FROM profiles WHERE user_id = $1',
-      [userId]
-    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Profilo non trovato' });
+    }
 
-    const user = userRes.rows[0] || null;
-    const profile = profileRes.rows[0] || null;
-
-    res.json({ user, profile });
+    const row = result.rows[0];
+    res.json({
+      user: {
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        bio: row.bio,
+        photo_url: row.photo_url,
+        email: row.email,
+      },
+      profile: {
+        gender: row.gender,
+        interests: row.interests,
+        looking_for: row.looking_for,
+      }
+    });
   } catch (err) {
-    console.error('Get profile error:', err);
+    logger.error('Get profile error:', err);
     res.status(500).json({ message: 'Errore nel server' });
   }
 }
 
-// Recupera il profilo pubblico di un altro utente
+// Recupera il profilo pubblico di un altro utente (optimized con JOIN)
 async function getProfileById(req, res) {
   const id = parseInt(req.params.id, 10);
   if (!id) return res.status(400).json({ message: 'ID non valido' });
 
   try {
-    const userRes = await pool.query(
-      'SELECT id, name, age, bio, photo_url FROM users WHERE id = $1',
+    // JOIN una sola query
+    const result = await pool.query(
+      `SELECT 
+        u.id, u.name, u.age, u.bio, u.photo_url,
+        p.gender, p.interests, p.looking_for
+       FROM users u
+       LEFT JOIN profiles p ON u.id = p.user_id
+       WHERE u.id = $1`,
       [id]
     );
 
-    const profileRes = await pool.query(
-      'SELECT gender, interests, looking_for FROM profiles WHERE user_id = $1',
-      [id]
-    );
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Utente non trovato' });
+    }
 
-    const user = userRes.rows[0] || null;
-    const profile = profileRes.rows[0] || null;
-
-    if (!user) return res.status(404).json({ message: 'Utente non trovato' });
-
-    res.json({ user, profile });
+    const row = result.rows[0];
+    res.json({
+      user: {
+        id: row.id,
+        name: row.name,
+        age: row.age,
+        bio: row.bio,
+        photo_url: row.photo_url,
+      },
+      profile: {
+        gender: row.gender,
+        interests: row.interests,
+        looking_for: row.looking_for,
+      }
+    });
   } catch (err) {
-    console.error('Get profile by id error:', err);
+    logger.error('Get profile by id error:', err);
     res.status(500).json({ message: 'Errore nel server' });
   }
 }
@@ -62,12 +94,6 @@ async function updateProfile(req, res) {
   const { name, age, bio, gender, interests, looking_for } = req.body;
 
   try {
-    // Aggiorna la tabella users
-    await pool.query(
-      'UPDATE users SET name = COALESCE($1, name), age = COALESCE($2, age), bio = COALESCE($3, bio), updated_at = NOW() WHERE id = $4',
-      [name, age || null, bio || null, userId]
-    );
-
     // Prepara interests come array o NULL
     let interestsArr = null;
     if (interests) {
@@ -77,7 +103,14 @@ async function updateProfile(req, res) {
       }
     }
 
-    // Upsert nella tabella profiles
+    // Transaction: aggiorna sia users che profiles
+    await pool.query('BEGIN');
+    
+    await pool.query(
+      'UPDATE users SET name = COALESCE($1, name), age = COALESCE($2, age), bio = COALESCE($3, bio), updated_at = NOW() WHERE id = $4',
+      [name || null, age || null, bio || null, userId]
+    );
+
     await pool.query(
       `INSERT INTO profiles (user_id, gender, interests, looking_for)
        VALUES ($1, $2, $3, $4)
@@ -86,9 +119,13 @@ async function updateProfile(req, res) {
       [userId, gender || null, interestsArr, looking_for || null]
     );
 
+    await pool.query('COMMIT');
+    
+    logger.info(`Profile updated for user ${userId}`);
     res.json({ message: 'Profilo aggiornato' });
   } catch (err) {
-    console.error('Update profile error:', err);
+    await pool.query('ROLLBACK');
+    logger.error('Update profile error:', err);
     res.status(500).json({ message: 'Errore nel server' });
   }
 }
@@ -102,9 +139,10 @@ async function uploadPhoto(req, res) {
   try {
     const photoUrl = `/uploads/${req.file.filename}`;
     await pool.query('UPDATE users SET photo_url = $1, updated_at = NOW() WHERE id = $2', [photoUrl, userId]);
+    logger.info(`Photo uploaded for user ${userId}: ${req.file.filename}`);
     res.json({ photo_url: photoUrl });
   } catch (err) {
-    console.error('Upload photo error:', err);
+    logger.error('Upload photo error:', err);
     res.status(500).json({ message: 'Errore nel server' });
   }
 }

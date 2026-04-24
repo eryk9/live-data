@@ -1,14 +1,8 @@
 const express = require('express');
-require('express-async-errors');
+require('dotenv').config();
 const path = require('path');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-
 const pool = require('./db');
 const redis = require('./cache');
-const logger = require('./logger');
-const config = require('./config');
-
 const { signup, login, forgotPassword, resetPassword, verifyToken, verifyEmail } = require('./auth');
 const { getMyProfile, getProfileById, updateProfile, uploadPhoto } = require('./profiles');
 const multer = require('multer');
@@ -18,31 +12,11 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const app = express();
-const port = config.PORT;
+const port = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
-// Middleware di Sicurezza
-app.use(helmet());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
-
-// Rate Limiting - protezione da brute force e DoS
-const limiter = rateLimit({
-  windowMs: config.RATE_LIMIT.windowMs,
-  max: config.RATE_LIMIT.max,
-  message: 'Troppe richieste, riprova più tardi',
-  standardHeaders: true,
-  legacyHeaders: false,
-});
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5, // Max 5 tentativi login per 15 minuti
-  skipSuccessfulRequests: true,
-  message: 'Troppi tentativi di accesso, riprova più tardi',
-});
-
-app.use('/api', limiter);
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/signup', authLimiter);
+// Middleware
+app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Auth Routes
@@ -62,19 +36,9 @@ app.get('/api/profile/me', verifyToken, getMyProfile);
 app.get('/api/profile/:id', verifyToken, getProfileById);
 app.post('/api/profile', verifyToken, updateProfile);
 
-
-// Validazione Multer - file upload sicuro
+// Preparazione cartella uploads e multer
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-
-const fileFilter = (req, file, cb) => {
-  // Validazione tipi MIME
-  if (!config.UPLOAD.ALLOWED_TYPES.includes(file.mimetype)) {
-    return cb(new Error(`Tipo di file non permesso: ${file.mimetype}`));
-  }
-  cb(null, true);
-};
-
 const storage = multer.diskStorage({
   destination: uploadDir,
   filename: (req, file, cb) => {
@@ -82,40 +46,22 @@ const storage = multer.diskStorage({
     cb(null, `${req.user.id}-${Date.now()}${ext}`);
   }
 });
-
-const upload = multer({
-  storage,
-  fileFilter,
-  limits: {
-    fileSize: config.UPLOAD.MAX_FILE_SIZE,
-  }
-});
+const upload = multer({ storage });
 
 app.post('/api/profile/photo', verifyToken, upload.single('photo'), uploadPhoto);
 
 // Socket.IO setup for real-time chat
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: config.APP_URL,
-    methods: ['GET', 'POST'],
-    credentials: true
-  }
-});
+const io = new Server(server, { cors: { origin: '*' } });
 
 io.use((socket, next) => {
   const token = socket.handshake.auth && socket.handshake.auth.token;
   if (!token) return next(new Error('Authentication error'));
   try {
-    if (!config.JWT_SECRET) {
-      logger.error('JWT_SECRET not configured');
-      return next(new Error('Server configuration error'));
-    }
-    const decoded = jwt.verify(token, config.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     socket.user = decoded;
     return next();
   } catch (err) {
-    logger.error('Socket auth error:', err);
     return next(new Error('Authentication error'));
   }
 });
@@ -245,54 +191,12 @@ app.get('/forgot-password', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'forgot-password.html'));
 });
 
-// Global Error Handler Middleware
-app.use((err, req, res, next) => {
-  // Errori di multer
-  if (err instanceof multer.MulterError) {
-    if (err.code === 'FILE_TOO_LARGE') {
-      return res.status(400).json({ message: 'File troppo grande (max 5MB)' });
-    }
-    logger.error('Multer error:', err);
-    return res.status(400).json({ message: 'Errore nel caricamento file' });
-  }
-
-  // Errori di validazione file
-  if (err.message && err.message.includes('Tipo di file non permesso')) {
-    logger.error('Invalid file type:', err);
-    return res.status(400).json({ message: err.message });
-  }
-
-  // Errori standard
-  const status = err.status || 500;
-  const message = err.message || 'Errore interno del server';
-  
-  if (status === 500) {
-    logger.error('Unhandled error:', err);
-  } else {
-    logger.warn(`API error (${status}):`, message);
-  }
-
-  res.status(status).json({
-    message,
-    ...(config.NODE_ENV === 'development' && { stack: err.stack })
-  });
-});
-
-// 404 Not Found
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route non trovata' });
-});
-
 // Avvio server (usiamo HTTP server creato per Socket.IO)
 server.listen(port, () => {
-  if (!config.JWT_SECRET) {
-    logger.error('❌ JWT_SECRET non configurato! Imposta JWT_SECRET nel file .env');
-    process.exit(1);
-  }
-  logger.info(`🚀 App listening on port ${port}`);
-  logger.info(`📱 Frontend: http://localhost:${port}`);
-  logger.info(`🔐 Login: http://localhost:${port}/login`);
-  logger.info(`📝 Signup: http://localhost:${port}/signup`);
-  logger.info(`💾 Database: PostgreSQL`);
-  logger.info(`⚡ Cache: Redis`);
+  console.log(`\n🚀 App listening on port ${port}`);
+  console.log(`📱 Frontend: http://localhost:${port}`);
+  console.log(`🔐 Login: http://localhost:${port}/login`);
+  console.log(`📝 Signup: http://localhost:${port}/signup`);
+  console.log(`💾 Database: PostgreSQL`);
+  console.log(`⚡ Cache: Redis\n`);
 });
