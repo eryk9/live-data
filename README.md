@@ -226,7 +226,7 @@ Questo progetto è distribuito sotto licenza MIT. Vedi il file `LICENSE` per mag
 
 ## 👨‍💻 Autore
 
-**Il tuo nome** - [Il tuo GitHub](https://github.com/tuo-username)
+**Erik9** - [Il tuo GitHub](https://github.com/eryk9)
 
 ## 🙏 Ringraziamenti
 
