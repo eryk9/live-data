@@ -2,7 +2,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "jest --coverage",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
